@@ -3,21 +3,21 @@ import { TUser, THardware, TLocation } from "../../types/types";
 
 // Create Schemas
 const locationSchema = new Schema<TLocation>({
-  ip_address: { type: String, required: true },
-  country_name: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  continent_name: { type: String, required: true },
-  continent_code: { type: String, required: true },
-  federative_unite: { type: String, required: true },
+  ip_address: { type: String },
+  country_name: { type: String },
+  city: { type: String },
+  state: { type: String },
+  continent_name: { type: String },
+  continent_code: { type: String },
+  federative_unite: { type: String },
 });
 
 const hardwareSchema = new Schema<THardware>({
-  desktop: { type: String, required: true },
-  cpu: { type: String, required: true },
-  gpu: { type: String, required: true },
-  ram: { type: Number, required: true },
-  mac: { type: String, required: true },
+  desktop: { type: String },
+  cpu: { type: String },
+  gpu: { type: String },
+  ram: { type: Number },
+  mac: { type: String },
 });
 
 const userSchema = new Schema<TUser>(
@@ -29,21 +29,16 @@ const userSchema = new Schema<TUser>(
     },
     username: {
       type: String,
-      required: true,
-      unique: true,
       lowercase: true,
     },
     password: {
       type: String,
-      required: true,
     },
     activation_date: {
       type: Date,
-      required: true,
     },
     expiration_date: {
       type: Date,
-      required: true,
     },
     status: {
       type: String,
@@ -71,3 +66,4 @@ const userSchema = new Schema<TUser>(
 );
 
 export const User = model<TUser>("users", userSchema);
+export const OldUser = model<TUser>("oldusers", userSchema);
