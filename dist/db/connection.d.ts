@@ -1,1 +1,2 @@
-export declare const connect: () => Promise<void>;
+import mongoose from "mongoose";
+export declare const connect: () => Promise<typeof mongoose>;

@@ -24,8 +24,6 @@ const userSchema = new Schema<TUser>(
   {
     discordID: {
       type: String,
-      required: true,
-      unique: true,
     },
     username: {
       type: String,

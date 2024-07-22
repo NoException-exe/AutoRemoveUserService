@@ -21,8 +21,6 @@ const hardwareSchema = new mongoose_1.Schema({
 const userSchema = new mongoose_1.Schema({
     discordID: {
         type: String,
-        required: true,
-        unique: true,
     },
     username: {
         type: String,

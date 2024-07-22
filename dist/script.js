@@ -1,7 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
 const connection_1 = require("./db/connection");
 const users_1 = require("./db/models/users");
+const node_cron_1 = __importDefault(require("node-cron"));
 async function findUsersExpired() {
     return await users_1.User.find({
         expiration_date: {
@@ -38,22 +43,37 @@ async function main() {
     const users = await findUsersExpired();
     if (users.length === 0) {
         console.log("No expired users found");
+        mongoose_1.default.connection.close();
+        console.log("Disconnected from MongoDB");
         return;
     }
     for (const user of users) {
-        try {
-            await saveOldUser(user).catch((err) => {
-                console.log(`Failed to save user ${user.discordID}:`, err);
-                throw new Error("Failed to save user to OldUser collection");
-            });
-            console.log(`Saved user ${user.discordID} to OldUser collection`);
-            await users_1.User.deleteOne({ discordID: user.discordID });
-            console.log(`Deleted user ${user.discordID} from User collection`);
-        }
-        catch (err) {
-            console.log(`Failed to process user ${user.discordID}:`, err);
-        }
+        await saveOldUser(user);
+        console.log(`Saved user ${user.discordID} to OldUser collection`);
+    }
+    try {
+        await users_1.User.deleteMany({
+            expiration_date: {
+                $lt: new Date(new Date().setDate(new Date().getDate() - 30)),
+            },
+        });
+        console.log("Deleted expired users from User collection");
+    }
+    catch (err) {
+        console.log(err);
+    }
+    finally {
+        mongoose_1.default.connection.close();
+        console.log("Disconnected from MongoDB");
     }
 }
-main();
+let firstStert = true;
+if (firstStert) {
+    main().catch((err) => console.log("Error running main task:", err));
+    firstStert = false;
+}
+node_cron_1.default.schedule("0 */12 * * *", () => {
+    console.log("Running scheduled task");
+    main().catch((err) => console.log("Error running main task:", err));
+});
 //# sourceMappingURL=script.js.map

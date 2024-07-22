@@ -1,7 +1,8 @@
+import mongoose from "mongoose";
 import { connect } from "./db/connection";
-import { OldUser } from "./db/models/oldusers";
-import { User } from "./db/models/users";
+import { User, OldUser } from "./db/models/users";
 import { TUser } from "./types/types";
+import cron from "node-cron";
 
 /**
  * Retrieves an array of users whose expiration date is less than 30 days from the current date.
@@ -48,7 +49,7 @@ const saveOldUser = async (user: TUser): Promise<void> => {
 /**
  * Connects to MongoDB, retrieves expired users, saves them to the OldUser collection, and deletes the users.
  *
- * @return {Promise<void>} A promise that resolves when the process is complete.
+ * @return {Promise<typeof mongoose>} A promise that resolves when the process is complete.
  */
 async function main(): Promise<void> {
   // Connect to MongoDB
@@ -62,6 +63,10 @@ async function main(): Promise<void> {
   // Check if there are any expired users
   if (users.length === 0) {
     console.log("No expired users found");
+
+    // Disconnect from MongoDB
+    mongoose.connection.close();
+    console.log("Disconnected from MongoDB");
     return;
   }
 
@@ -81,7 +86,22 @@ async function main(): Promise<void> {
     console.log("Deleted expired users from User collection");
   } catch (err) {
     console.log(err);
+  } finally {
+    // Disconnect from MongoDB
+    mongoose.connection.close();
+    console.log("Disconnected from MongoDB");
   }
 }
 
-main();
+// Run the main task only once
+let firstStert = true;
+if (firstStert) {
+  main().catch((err) => console.log("Error running main task:", err));
+  firstStert = false;
+}
+
+// Schedule the task to run every 12 hours
+cron.schedule("0 */12 * * *", () => {
+  console.log("Running scheduled task");
+  main().catch((err) => console.log("Error running main task:", err));
+});
