@@ -1,0 +1,22 @@
+{
+  "name": "dopeclear",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file .env dist/script.js",
+    "dev": "tsx --env-file .env --watch src/script.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "mongoose": "^8.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}
