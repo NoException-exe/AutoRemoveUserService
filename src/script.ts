@@ -1,5 +1,6 @@
 import { connect } from "./db/connection";
-import { User, OldUser } from "./db/models/users";
+import { OldUser } from "./db/models/oldusers";
+import { User } from "./db/models/users";
 import { TUser } from "./types/types";
 
 /**

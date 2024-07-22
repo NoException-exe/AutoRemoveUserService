@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const connection_1 = require("./db/connection");
-const oldusers_1 = require("./db/models/oldusers");
 const users_1 = require("./db/models/users");
 async function findUsersExpired() {
     return await users_1.User.find({
@@ -26,7 +25,7 @@ const saveOldUser = async (user) => {
         blockedHardware: user.blockedHardware,
     };
     try {
-        await oldusers_1.OldUser.create(data);
+        await users_1.OldUser.create(data);
     }
     catch (err) {
         console.log(err);
@@ -37,25 +36,23 @@ async function main() {
         .then(() => console.log("Connected to MongoDB"))
         .catch((err) => console.log(err));
     const users = await findUsersExpired();
-    await Promise.all(users.map(async (user) => {
+    if (users.length === 0) {
+        console.log("No expired users found");
+        return;
+    }
+    for (const user of users) {
         try {
-            await saveOldUser(user);
+            await saveOldUser(user).catch((err) => {
+                console.log(`Failed to save user ${user.discordID}:`, err);
+                throw new Error("Failed to save user to OldUser collection");
+            });
             console.log(`Saved user ${user.discordID} to OldUser collection`);
+            await users_1.User.deleteOne({ discordID: user.discordID });
+            console.log(`Deleted user ${user.discordID} from User collection`);
         }
         catch (err) {
-            console.log(err);
+            console.log(`Failed to process user ${user.discordID}:`, err);
         }
-    }));
-    try {
-        await users_1.User.deleteMany({
-            expiration_date: {
-                $lt: new Date(new Date().setDate(new Date().getDate() - 30)),
-            },
-        });
-        console.log("Deleted expired users from User collection");
-    }
-    catch (err) {
-        console.log(err);
     }
 }
 main();

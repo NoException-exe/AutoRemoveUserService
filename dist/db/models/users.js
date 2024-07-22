@@ -1,22 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.OldUser = exports.User = void 0;
 const mongoose_1 = require("mongoose");
 const locationSchema = new mongoose_1.Schema({
-    ip_address: { type: String, required: true },
-    country_name: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    continent_name: { type: String, required: true },
-    continent_code: { type: String, required: true },
-    federative_unite: { type: String, required: true },
+    ip_address: { type: String },
+    country_name: { type: String },
+    city: { type: String },
+    state: { type: String },
+    continent_name: { type: String },
+    continent_code: { type: String },
+    federative_unite: { type: String },
 });
 const hardwareSchema = new mongoose_1.Schema({
-    desktop: { type: String, required: true },
-    cpu: { type: String, required: true },
-    gpu: { type: String, required: true },
-    ram: { type: Number, required: true },
-    mac: { type: String, required: true },
+    desktop: { type: String },
+    cpu: { type: String },
+    gpu: { type: String },
+    ram: { type: Number },
+    mac: { type: String },
 });
 const userSchema = new mongoose_1.Schema({
     discordID: {
@@ -26,21 +26,16 @@ const userSchema = new mongoose_1.Schema({
     },
     username: {
         type: String,
-        required: true,
-        unique: true,
         lowercase: true,
     },
     password: {
         type: String,
-        required: true,
     },
     activation_date: {
         type: Date,
-        required: true,
     },
     expiration_date: {
         type: Date,
-        required: true,
     },
     status: {
         type: String,
@@ -65,4 +60,5 @@ const userSchema = new mongoose_1.Schema({
     },
 }, { timestamps: true });
 exports.User = (0, mongoose_1.model)("users", userSchema);
+exports.OldUser = (0, mongoose_1.model)("oldusers", userSchema);
 //# sourceMappingURL=users.js.map
